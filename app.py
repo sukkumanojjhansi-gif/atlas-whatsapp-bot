@@ -35,13 +35,13 @@ def whatsapp_reply():
             response = model.generate_content(incoming_msg)
             reply_text = response.text.strip()
         else:
-            reply_text = "API Key issue."
+            reply_text = "API Key error."
     except Exception as e:
         reply_text = f"Error: {str(e)}"
 
     msg.body(reply_text)
     return str(resp)
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
