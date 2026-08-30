@@ -1,47 +1,46 @@
-﻿import os
+import os
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import google.generativeai as genai
 
-app = Flask(__name__)
+app = Flask(_name_)
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+# Direct API Configuration
+API_KEY = "AQ.Ab8RN6KYM3-YW-rPl_wQioddlooam2BLmvoeqf2ped7plyBT0A"
 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
-        system_instruction="Aap Atlas AI hain. Hindi aur Hinglish me helpful jawab dein."
-    )
-else:
+try:
+    genai.configure(api_key=API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+except Exception as init_err:
     model = None
 
 @app.route("/", methods=["GET"])
 def home():
-    return "Atlas AI WhatsApp Bot is Running 24/7!"
+    return "Atlas Bot is Live and Healthy!"
 
-@app.route("/whatsapp", methods=["POST"])
-def whatsapp_reply():
+@app.route("/whatsapp", methods=["POST", "GET"])
+def whatsapp_webhook():
     incoming_msg = request.values.get("Body", "").strip()
     resp = MessagingResponse()
     msg = resp.message()
 
     if not incoming_msg:
-        msg.body("Namaste! Main Atlas AI hoon. Bataiye kya madad kar sakta hoon?")
+        msg.body("Namaste! Main Atlas AI hoon. Aapka message mujhe mil gaya hai.")
         return str(resp)
 
     try:
         if model:
-            response = model.generate_content(incoming_msg)
-            reply_text = response.text.strip()
+            # Gemini generation
+            gemini_res = model.generate_content(incoming_msg)
+            reply = gemini_res.text.strip()
         else:
-            reply_text = "API Key error."
+            reply = "Atlas Bot: AI Model configure nahi ho paya."
     except Exception as e:
-        reply_text = f"Error: {str(e)}"
+        reply = f"Atlas Bot Error: {str(e)}"
 
-    msg.body(reply_text)
+    msg.body(reply)
     return str(resp)
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
