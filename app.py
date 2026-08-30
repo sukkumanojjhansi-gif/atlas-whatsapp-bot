@@ -1,24 +1,17 @@
-﻿import os
+import os
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import google.generativeai as genai
 
 app = Flask(_name_)
 
-# Environment Variable se API Key lena (GitHub block nahi karega)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    # Gemini Flash model ka use
     model = genai.GenerativeModel(
         model_name="gemini-1.5-flash",
-        system_instruction=(
-            "Aapka naam Atlas AI hai. Aap ek helpful, smart aur humble AI assistant hain. "
-            "Aap Hindi aur Hinglish me friendly aur clear jawab dete hain. "
-            "Aap AI Bot Development, Website Design aur Computer/Electronics support provide karte hain. "
-            "Hamesha to-the-point aur helpful answer dein."
-        )
+        system_instruction="Aap Atlas AI hain. Hindi aur Hinglish me helpful jawab dein."
     )
 else:
     model = None
@@ -34,7 +27,7 @@ def whatsapp_reply():
     msg = resp.message()
 
     if not incoming_msg:
-        msg.body("Namaste! Main Atlas AI hoon. Aap mujhse koi bhi sawal pooch sakte hain.")
+        msg.body("Namaste! Main Atlas AI hoon. Bataiye kya madad kar sakta hoon?")
         return str(resp)
 
     try:
@@ -42,7 +35,7 @@ def whatsapp_reply():
             response = model.generate_content(incoming_msg)
             reply_text = response.text.strip()
         else:
-            reply_text = "API Key configure nahi hai. Kripya Environment Variable set karein."
+            reply_text = "API Key issue."
     except Exception as e:
         reply_text = f"Error: {str(e)}"
 
