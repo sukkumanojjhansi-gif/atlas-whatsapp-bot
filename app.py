@@ -1,9 +1,9 @@
-import os
+﻿import os
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import google.generativeai as genai
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
