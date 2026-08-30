@@ -1,18 +1,18 @@
 import os
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
-import google.generativeai as genai
+from google import genai
 
 app = Flask(__name__)
 
-# Direct API Configuration
-API_KEY = "AQ.Ab8RN6KYM3-YW-rPl_wQioddlooam2BLmvoeqf2ped7plyBT0A"
+# आपकी नई AQ वाली API Key
+API_KEY = "AQ.Ab8RN6UoUmPm_fTZ3cgKY3RzljQz-ryZ8gbGkuimAoZeCco0Q"
 
 try:
-    genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    # New official Gemini SDK Client
+    client = genai.Client(api_key=API_KEY)
 except Exception as init_err:
-    model = None
+    client = None
 
 @app.route("/", methods=["GET"])
 def home():
@@ -29,12 +29,15 @@ def whatsapp_webhook():
         return str(resp)
 
     try:
-        if model:
-            # Gemini generation
-            gemini_res = model.generate_content(incoming_msg)
+        if client:
+            # New generate content syntax
+            gemini_res = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=incoming_msg
+            )
             reply = gemini_res.text.strip()
         else:
-            reply = "Atlas Bot: AI Model configure nahi ho paya."
+            reply = "Atlas Bot: AI Client configure nahi ho paya."
     except Exception as e:
         reply = f"Atlas Bot Error: {str(e)}"
 
